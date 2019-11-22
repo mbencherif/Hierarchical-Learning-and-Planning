@@ -1,0 +1,8 @@
+matplotlib
+numpy
+torch
+gym
+gym-minigrid
+absl-py
+pathlib2
+argparse
