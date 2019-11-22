@@ -1,4 +1,4 @@
-# Hierarchical Learning and Planning (work in progress)
+# Hierarchical Learning and Planning (in progress)
 
 ---
 
@@ -11,9 +11,16 @@
 and are thereby stuck in undesirable situations
 * Finding suitable __representations__ for different abstraction levels. Should the perception-planner interface be handcrafted at all?
  
+### Agents
 
-#### Hierarchical Deep Q-Learning
+#### Clipped Deep Q-Learning (DQL)
+Non-hierarchical baseline implementation.
 
+#### Hierarchical DQL
+
+#### Successor Representation (SR) Learning
+
+### Hierarchical SR Learning
 
 ---
 
