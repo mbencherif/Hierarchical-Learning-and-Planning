@@ -2,9 +2,9 @@
 
 ---
 
-### Project Overview
+## Project Overview
 
-#### Difficulties in hierarchical decision making: 
+### Difficulties in hierarchical decision making: 
 
 * Efficiently reusing known sub-policies: __meta-learning__
 * Enabling __smooth (dis-)engagements__ between high-level policies. In unknown environments or surroundings, hierarchical approaches tend to oscillate between the high- and low-level strategy 
