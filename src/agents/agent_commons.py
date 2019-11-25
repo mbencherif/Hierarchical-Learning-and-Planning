@@ -25,6 +25,8 @@ def create_nn_layer(conf):
     return nn.Tanh()
   elif conf["type"] == "sigm":
     return nn.Sigmoid()
+  elif conf["type"] == "softmax":
+    return nn.Softmax()
   else:
     raise NotImplementedError(
       f"This type of layer is not supported: {conf['type']}")

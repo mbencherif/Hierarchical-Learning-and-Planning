@@ -27,7 +27,7 @@ class QNet(nn.Module):
     super(QNet, self).__init__()
 
     layer_param[0]["n_neurons"][0] = state_dim
-    layer_param[-2]["n_neurons"][1] = action_dim
+    layer_param[-1]["n_neurons"][1] = action_dim
     self.layer_param = layer_param
 
     self.module_list = nn.ModuleList()

@@ -1,6 +1,7 @@
 import gym
 import unittest
 import numpy as np
+import torch
 
 from src.agents.dqn.dqn_agent import DQNAgent
 
@@ -36,26 +37,26 @@ class DQNAgentTest(unittest.TestCase):
     return episode_rewards
 
   def test_dqn_on_cartpole(self):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     env_id = "CartPole-v0"
-    MAX_EPISODES = 1000
-    MAX_STEPS = 500
-    BATCH_SIZE = 1
+    max_episoed = 1000
+    max_steps = 500
+    batch_size = 64
 
     env = gym.make(env_id)
 
     layer_param = [
-          {"type": "linear", "n_neurons": [0, 256]},
+          {"type": "linear", "n_neurons": [0, 128]},
           {"type": "relu"},
-          {"type": "linear", "n_neurons": [256, 256]},
+          {"type": "linear", "n_neurons": [128, 128]},
           {"type": "relu"},
-          {"type": "linear", "n_neurons": [256, 0]},
-          {"type": "tanh"}  # TODO (#4): is tanh needed?
+          {"type": "linear", "n_neurons": [128, 0]},
         ]
-
-    agent = DQNAgent(env, layer_param)
+    agent = DQNAgent(env, layer_param, device)
 
     episode_rewards = self.mini_batch_train(
-      env, agent, MAX_EPISODES, MAX_STEPS, BATCH_SIZE)
+      env, agent, max_episoed, max_steps, batch_size)
 
     avrg_r_first_half = np.mean(np.array(
       episode_rewards[:len(episode_rewards) / 2]))
