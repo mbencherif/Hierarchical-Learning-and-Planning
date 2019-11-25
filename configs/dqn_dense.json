@@ -8,17 +8,10 @@
   "eval_steps": 10,
   "lr": 1e-4,
   "q_net_layers": [
-      {"type":  "conv", "filter":  [0, 32], "kernel_size": 8, "stride":  4},
-      {"type": "relu"},
-      {"type":  "conv", "filter":  [32, 64], "kernel_size": 4, "stride":  2},
-      {"type": "relu"},
-      {"type":  "conv", "filter":  [64, 64], "kernel_size": 3, "stride":  1},
-      {"type": "relu"},
       {"type": "linear", "n_neurons": [0, 256]},
       {"type": "relu"},
       {"type": "linear", "n_neurons": [256, 256]},
       {"type": "relu"},
       {"type": "linear", "n_neurons": [256, 0]},
-      {"type": "tanh"}
     ]
 }
