@@ -16,15 +16,14 @@ and are thereby stuck in undesirable situations
 #### Clipped Deep Q-Learning (DQL)
 Primarily used as a non-hierarchical baseline implementation, but can can futher be used as part of the heirarchical planning framework.
 
-#### Hierarchical DQL
-(ToDo)
-
 #### Successor Reinforcement Learning
-* [Deep Successor Feature Learning](https://arxiv.org/pdf/1606.02396.pdf): "Deep Successor Reinforcement Learning", T. Kulkarni, et al., 2016.
-* [Successor Feature Learning](https://arxiv.org/pdf/1906.09480.pdf) in POMDPs: "A neurally plausible model learns successorrepresentations in partially observable environments", E. Vértes, M. Sahani, 2019.
+* [Deep Successor Feature Learning](https://arxiv.org/pdf/1606.02396.pdf): End-to-end appraoch for learning successor features using deep convolutional neural networks.
+* [Successor Feature Learning](https://arxiv.org/pdf/1906.09480.pdf) Elegant appraoch to calculating successor features in partially observable and noisy environments.
 
-### Hierarchical SR Learning
-(ToDo)
+### Hierarchical Agents:
+* Hierarchical Deep Q-Learning: (ToDo)
+* Hierarchical Successor Features Learning: (ToDo)
+
 
 ---
 
