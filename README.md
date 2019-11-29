@@ -20,8 +20,8 @@ Primarily used as a non-hierarchical baseline implementation, but can can futher
 (ToDo)
 
 #### Successor Reinforcement Learning
-* __Deep Successor Feature Learning__[https://arxiv.org/pdf/1606.02396.pdf]: "Deep Successor Reinforcement Learning", T. Kulkarni, et al., 2016.
-* __Successor Feature Learning__[https://arxiv.org/pdf/1906.09480.pdf] in POMDPs: "A neurally plausible model learns successorrepresentations in partially observable environments", E. Vértes, M. Sahani, 2019.
+* [Deep Successor Feature Learning](https://arxiv.org/pdf/1606.02396.pdf): "Deep Successor Reinforcement Learning", T. Kulkarni, et al., 2016.
+* [Successor Feature Learning](https://arxiv.org/pdf/1906.09480.pdf) in POMDPs: "A neurally plausible model learns successorrepresentations in partially observable environments", E. Vértes, M. Sahani, 2019.
 
 ### Hierarchical SR Learning
 (ToDo)
