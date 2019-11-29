@@ -33,6 +33,7 @@ Requirements:
 * Python 3.6+
 * PyTorch 1.3+
 * [Mini Gridworld](https://github.com/maximecb/gym-minigrid), a minimalistic gridworld environment developed by [maximecb](https://pointersgonewild.com/about/)
+* [Safety-Gym](https://github.com/openai/safety-gym), is a gym environment created by [OpenAI](https://openai.com/blog/safety-gym/) for evaluating safe reinforcement learning algorithms.
 
 Installation:
 * Create a virtual python environment and install  all requirements with: `bash install.sh`
