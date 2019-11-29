@@ -24,16 +24,18 @@ Primarily used as a non-hierarchical baseline implementation, but can can futher
 * Hierarchical Deep Q-Learning: (ToDo)
 * Hierarchical Successor Features Learning: (ToDo)
 
+### Environments
+* [Mini Gridworld](https://github.com/maximecb/gym-minigrid), a minimalistic gridworld environment developed by [maximecb](https://pointersgonewild.com/about/)
+* [Safety-Gym](https://github.com/openai/safety-gym), is a gym environment created by [OpenAI](https://openai.com/blog/safety-gym/) ([paper](https://cdn.openai.com/safexp-short.pdf)) for evaluating safe reinforcement learning algorithms.
+* [AI Safety Gridworlds](https://github.com/deepmind/ai-safety-gridworlds)([paper](https://arxiv.org/pdf/1711.09883.pdf))
 
 ---
 
-### How to run the experiments:
+## How to run the experiments:
 
 Requirements:
 * Python 3.6+
 * PyTorch 1.3+
-* [Mini Gridworld](https://github.com/maximecb/gym-minigrid), a minimalistic gridworld environment developed by [maximecb](https://pointersgonewild.com/about/)
-* [Safety-Gym](https://github.com/openai/safety-gym), is a gym environment created by [OpenAI](https://openai.com/blog/safety-gym/) for evaluating safe reinforcement learning algorithms.
 
 Installation:
 * Create a virtual python environment and install  all requirements with: `bash install.sh`
