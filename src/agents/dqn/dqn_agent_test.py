@@ -50,6 +50,7 @@ class DQNAgentTest(unittest.TestCase):
                      device=device)
 
     t0 = time.time()
+    overall_results = []
     for episode in range(n_episodes):
       state = env.reset()
       ep_steps = []
@@ -65,14 +66,14 @@ class DQNAgentTest(unittest.TestCase):
 
           if episode % logging_interval == 0:
             avrg_steps = np.mean(np.asarray(ep_steps))
-            #ep_steps = []
+            overall_results.append(avrg_steps)
             print(f"Ep {episode},\tAvrg steps reached {avrg_steps},"
                   f"\tEpsilon: {agent.epsilon:.2f},\ttook {time.time() - t0:.2f} sec")
             t0 = time.time()
 
           break
 
-    print(f"\nTraining Done!")
+    assert 500.0 in overall_results
 
 
 if __name__ == '__main__':
