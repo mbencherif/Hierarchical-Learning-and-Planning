@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 import torch
 
-from src.agents.sr.dsr_agent import DSRAgent
+from src.agents.dsr.dsr_agent import DSRAgent
 
 
 class SRAgentTest(unittest.TestCase):

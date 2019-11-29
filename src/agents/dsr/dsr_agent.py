@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 
 from src.agents.base_agent import BaseAgent
-from src.agents.sr.dsr_net import DSRNet
+from src.agents.dsr.dsr_net import DSRNet
 from src.agents.dqn.buffer_simple import SimpleBuffer
 
 
