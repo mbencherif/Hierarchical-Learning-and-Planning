@@ -27,9 +27,9 @@ Primarily used as a non-hierarchical baseline implementation, but can can futher
 ### Environments
 * [Mini Gridworld](https://github.com/maximecb/gym-minigrid), a minimalistic gridworld environment developed by [maximecb](https://pointersgonewild.com/about/)
 
-* [Safety-Gym](https://github.com/openai/safety-gym) ([paper](https://cdn.openai.com/safexp-short.pdf)), is a gym environment created by [OpenAI](https://openai.com/blog/safety-gym/) for evaluating safe reinforcement learning algorithms.
+* [Safety-Gym](https://github.com/openai/safety-gym) ([paper](https://cdn.openai.com/safexp-short.pdf)), a gym environment created by [OpenAI](https://openai.com/blog/safety-gym/) for evaluating safe reinforcement learning algorithms.
 
-* [AI Safety Gridworlds](https://github.com/deepmind/ai-safety-gridworlds) ([paper](https://arxiv.org/pdf/1711.09883.pdf)), is a gridworld environment created from DeepMind.
+* [AI Safety Gridworlds](https://github.com/deepmind/ai-safety-gridworlds) ([paper](https://arxiv.org/pdf/1711.09883.pdf)), a gridworld environment created from DeepMind.
 
 ---
 
