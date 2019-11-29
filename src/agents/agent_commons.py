@@ -15,15 +15,22 @@ def create_nn_layer(conf):
     return nn.Linear(conf["n_neurons"][0],
                      conf["n_neurons"][1])
   elif conf["type"] == "conv":
-    return nn.Conv2d(conf["filter"][0],
-                     conf["filter"][1],
-                     conf["kernel_size"],
-                     conf["stride"])
+    return nn.Conv2d(in_channels=conf["in_channels"],
+                     out_channels=conf["out_channels"],
+                     kernel_size=conf["kernel_size"],
+                     stride=conf["stride"],
+                     padding=0)
+  elif conf["type"] == "maxpool":
+    return nn.MaxPool2d(kernel_size=conf["kernel_size"],
+                        stride=conf["stride"],
+                        padding=conf["padding"])
+  elif conf["type"] == "batchnorm":
+    return nn.BatchNorm2d(conf["channels"])
   elif conf["type"] == "relu":
     return nn.ReLU()
   elif conf["type"] == "tanh":
     return nn.Tanh()
-  elif conf["type"] == "sigm":
+  elif conf["type"] == "sigmoid":
     return nn.Sigmoid()
   elif conf["type"] == "softmax":
     return nn.Softmax()

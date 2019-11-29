@@ -1,7 +1,7 @@
 import random
 import numpy as np
 import torch
-from collections import deque
+from collections import namedtuple, deque
 
 
 class SimpleBuffer:

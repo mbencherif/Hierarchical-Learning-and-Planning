@@ -5,7 +5,6 @@ from src.agents.base_agent import BaseAgent
 from src.agents.agent_commons import create_nn_layer
 
 
-
 class QNet(nn.Module):
 
   def __init__(self, state_dim, action_dim, layer_param):
