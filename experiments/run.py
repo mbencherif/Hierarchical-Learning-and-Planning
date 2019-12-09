@@ -8,25 +8,21 @@ from pathlib2 import Path
 import torch
 import torch.optim as optim
 
-
+from experiments.gym_runner import run_gym
 from src.utils import read_config
-from src.agents.dqn import DQNAgent
+from src.agents.dqn.dqn_agent import DQNAgent
 from environments.stochastic_mdp.stochastic_mdp import StochasticMDP
 
-USE_CUDA = torch.cuda.is_available()
 
-
-def run_hdqn(args, config, env, agent):
-    agent = HDQNAgent(num_goals=env.num_states,
-                      num_actions=env.num_actions)
-
-
-
+def run(device, config, save_dir):
+    env_id = "CartPole-v1"
+    run_gym(agent_param=config, device=device, save_dir=save_dir, env_id=env_id)
 
 
 def main(args):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     config = read_config(args.config_file)
-    env = StochasticMDP()
+    run(device=device, config=config, save_dir=args.save_directory)
 
 
 if __name__ == '__main__':
@@ -40,11 +36,11 @@ if __name__ == '__main__':
                         help="Path or file to experiment config file(s). "
                              "E.g '/Robust-Robotic-Manipulation/experiments"
                              "/configs'",
-                        default=f"{Path(os.getcwd()) / 'configs/exp01.json'}")
+                        default=f"{Path(os.getcwd()).parent / 'configs/dqn_dense.json'}")
     parser.add_argument("-d", "--save_directory",
                         help="The experiment output directory. "
                              "E.g.: ./experiment_results",
-                        default=f"{Path(os.getcwd()) / 'results/hdqn'}",
+                        default=f"{Path(os.getcwd()) / 'results/dqn'}",
                         type=str)
 
     args = parser.parse_args()
