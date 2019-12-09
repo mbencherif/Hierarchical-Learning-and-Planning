@@ -20,10 +20,10 @@ class DQNAgentTest(unittest.TestCase):
     tau = 1e-3
     lr = 1e-4
     training_interval = 2
-    n_episodes = 10000
+    n_episodes = 100000
     max_ep_steps = 1000
     epsilon = 0.999
-    epsilon_decay = 0.99995
+    epsilon_decay = 0.9999
     epsilon_min = 0.01
     logging_interval = 100
     layer_param = [

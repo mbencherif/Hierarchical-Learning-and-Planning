@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from absl import logging
 
 import torch
 import torch.nn.functional as F
@@ -8,7 +9,7 @@ import torch.optim as optim
 from src.agents.dqn.qnet import QNet
 from src.agents.dqn.buffer_simple import SimpleBuffer
 
-class DQNAgent():
+class DQNAgent:
   """Normal and Clipped Double Deep Q-Learning Agent."""
 
   def __init__(self,
@@ -69,7 +70,7 @@ class DQNAgent():
     self.epsilon_decay = epsilon_decay
     self.epsilon_min = epsilon_min
     self.memory = SimpleBuffer(max_size=buffer_size, device=device)
-    self.global_training_step = 0
+    self.global_step_count = 0
     self.qnet1 = QNet(state_dim, action_dim, layer_param).to(device)
     self.qnet2 = QNet(state_dim, action_dim, layer_param).to(device)
     self.optimizer1 = optim.Adam(self.qnet1.parameters(), lr=lr)
@@ -100,10 +101,55 @@ class DQNAgent():
 
   def step(self, state, action, reward, next_state, done):
     self.memory.push(state, action, reward, next_state, done)
-
-    if self.global_training_step % 2 == 0 and len(self.memory) > self.batch_size:
+    if self.global_step_count % 2 == 0 and len(self.memory) > self.batch_size:
       batch = self.memory.sample(self.batch_size)
       self.optimize_regular(batch)
+      #self.optimize_clipped(batch)
+    self.global_step_count += 1
+
+  def optimize_clipped(self, batch):
+    """Optimize the Q networks corresponding to Clipped Double Q-Learning."""
+    #batch = self.replay_buffer.sample(batch_size)
+    loss1, loss2 = self._compute_clipped_loss(batch)
+    self.optimizer1.zero_grad()
+    loss1.backward()
+    self.optimizer1.step()
+    self.optimizer2.zero_grad()
+    loss2.backward()
+    self.optimizer2.step()
+
+  def _compute_clipped_loss(self, batch):
+    """
+    Compute the loss given a batch of (s,a,s',r,t).
+
+    Calculating the loss for Clipped Double Q-Learning from:
+    "Addressing Function Approximation Error in Actor-Critic Methods", Fujimoto et al. (2018)
+    https://spinningup.openai.com/en/latest/algorithms/td3.html
+
+    :param batch: Tuple(torch.FloatTensor,
+                        torch.LongTensor,
+                        torch.FloatTensor,
+                        torch.FloatTensor,
+                        torch.FloatTensor)
+      Batch of (state, action , next_state, reward, terminal)-tuples.
+
+    :return loss1, loss2:
+      The MSE loss of Q-Net1 and Q-Net2.
+    """
+    states, actions, rewards, next_states, dones = batch
+    # Current Q1, Q2
+    q1_current = self.qnet1(states).gather(1, actions)
+    q2_current = self.qnet2(states).gather(1, actions)
+    # Target Q
+    q1_target_next = torch.max(self.qnet1.forward(next_states).detach(), 1)[0]
+    q2_target_next = torch.max(self.qnet2.forward(next_states).detach(), 1)[0]
+    q_target_next = torch.min(q1_target_next, q2_target_next)
+    q_target_next = q_target_next.view(q_target_next.size(0), 1)
+    target_q = rewards + ((1 - dones) * self.gamma * q_target_next)
+    # Loss
+    loss1 = F.mse_loss(q1_current, target_q.detach())
+    loss2 = F.mse_loss(q2_current, target_q.detach())
+    return loss1, loss2
 
   def optimize_regular(self, batch):
     """Optimize the Q networks corresponding to Double Q-Learning."""
@@ -137,52 +183,36 @@ class DQNAgent():
     loss = F.mse_loss(q_current, q_targets)
     return loss
 
-  def optimize_clipped(self, batch):
-    """Optimize the Q networks corresponding to Clipped Double Q-Learning."""
-    #batch = self.replay_buffer.sample(batch_size)
-    loss1, loss2 = self._compute_clipped_loss(batch)
-    self.optimizer1.zero_grad()
-    loss1.backward()
-    self.optimizer1.step()
-    self.optimizer2.zero_grad()
-    loss2.backward()
-    self.optimizer2.step()
-    self.global_training_step += 1
-
-  def _compute_clipped_loss(self, batch):
-    """
-    Compute the loss given a batch of (s,a,s',r,t).
-
-    Calculating the loss for Clipped Double Q-Learning from:
-    "Addressing Function Approximation Error in Actor-Critic Methods", Fujimoto et al. (2018)
-
-    :param batch: Tuple(torch.FloatTensor,
-                        torch.LongTensor,
-                        torch.FloatTensor,
-                        torch.FloatTensor,
-                        torch.FloatTensor)
-      Batch of (state, action , next_state, reward, terminal)-tuples.
-
-    :return loss1, loss2:
-      The MSE loss of Q-Net1 and Q-Net2.
-    """
-    states, actions, rewards, next_states, dones = batch
-    # Target Q
-    q1_targets_next = self.qnet1.forward(next_states).detach()
-    q2_targets_next = self.qnet2.forward(next_states).detach()
-    q_targets_next = torch.min(torch.max(q1_targets_next, 1)[0],
-                       torch.max(q2_targets_next, 1)[0])
-    #q_targets_next = q_targets_next.view(q_targets_next.size(0), 1)
-    target_q = rewards + (self.gamma * q_targets_next * (1 - dones))
-    # Current Q
-    q1_current = self.qnet1(states).gather(1, actions)
-    q2_current = self.qnet2(states).gather(1, actions)
-    # Loss
-    loss1 = F.mse_loss(q1_current, target_q.detach())
-    loss2 = F.mse_loss(q2_current, target_q.detach())
-    return loss1, loss2
-
   def _update_target_network(self, local_model, target_model):
     """Update target network: θ_target = τ*θ_local + (1 - τ)*θ_target."""
     for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
       target_param.data.copy_(self.tau * local_param.data + (1.0 - self.tau) * target_param.data)
+
+  def save(self, model_path):
+    model_path.mkdir(parents=True, exist_ok=True)
+    try:
+      torch.save(self.qnet1.state_dict(),
+                 (model_path / "qnet1").absolute().as_posix())
+      torch.save(self.optimizer1.state_dict(),
+                 (model_path / "optimizer1").absolute().as_posix())
+      torch.save(self.qnet2.state_dict(),
+                 (model_path / "qnet2").absolute().as_posix())
+      torch.save(self.optimizer2.state_dict(),
+                 (model_path / "optimizer2").absolute().as_posix())
+      logging.debug(f"DQN model saved to '{model_path}'")
+    except Exception as e:
+      logging.info(f"ERROR: DQN model was NOT saved to '{model_path}'")
+
+  def load(self, model_path):
+    try:
+      self.qnet1.load_state_dict(torch.load(
+        (model_path / "qnet1").absolute().as_posix()))
+      self.optimizer1.load_state_dict(torch.load(
+        (model_path / "optimizer1").absolute().as_posix()))
+      self.qnet2.load_state_dict(torch.load(
+        (model_path / "qnet2").absolute().as_posix()))
+      self.optimizer2.load_state_dict(torch.load(
+        (model_path / "optimizer2").absolute().as_posix()))
+      logging.info(f"DQN model loaded from '{model_path}'")
+    except Exception as e:
+      logging.info(f"No DQN model loaded from '{model_path}'")
