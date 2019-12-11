@@ -1,18 +1,16 @@
 {
   "seed": 42,
   "agent": "dqn",
-  "buffer_size": 100000,
-  "train_episodes": 10000,
-  "batch_size": 128,
+  "buffer_size": 10000,
+  "train_episodes": 1000,
+  "batch_size": 16,
   "gamma": 0.99,
   "eval_steps": 10,
   "lr": 1e-4,
-  "q_net_layers": [
-      {"type": "linear", "n_neurons": [0, 256]},
-      {"type": "relu"},
-      {"type": "linear", "n_neurons": [256, 256]},
-      {"type": "relu"},
-      {"type": "linear", "n_neurons": [256, 0]},
-      {"type": "sigmoid"}
-    ]
+  "tau": 1e-3,
+  "epsilon": 0.999,
+  "epsilon_decay": 0.999,
+  "epsilon_min": 0.01,
+  "q_net_layers": "conv"
+
 }

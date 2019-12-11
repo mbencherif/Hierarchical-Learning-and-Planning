@@ -6,15 +6,21 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-from src.agents.dqn.qnet import QNet
-from src.agents.dqn.buffer_simple import SimpleBuffer
+from src.agents.dqn_minigrid.qnet_dense import DenseQNet
+from src.agents.dqn_minigrid.qnet_conv import ConvQNet
+from src.agents.dqn_minigrid.buffer_simple_minigrid import SimpleBuffer
+from src.utils.plotting import plot_train_progress
 
-class DQNAgent:
+
+class DQNAgentMinigrid:
   """Normal and Clipped Double Deep Q-Learning Agent."""
 
+  # TODO: state space / action space input must be input correctly!
+  # TODO: => Adapt to other agents
+
   def __init__(self,
-               state_dim,
-               action_dim,
+               state_space,
+               action_space,
                buffer_size,
                batch_size,
                gamma,
@@ -25,6 +31,7 @@ class DQNAgent:
                epsilon_decay,
                epsilon_min,
                layer_param,
+               plot_dir,
                device):
     """
     Initialize the Deep Q Learning agent.
@@ -60,19 +67,28 @@ class DQNAgent:
       network calculations repectively.
     """
     self.device=device
-
-    self.action_dim = action_dim
     self.batch_size = batch_size
     self.gamma = gamma
-    self.training_interval = training_interval
+    self.training_interval = training_interval  # TODO is 1?
     self.tau = tau
     self.epsilon = epsilon
     self.epsilon_decay = epsilon_decay
     self.epsilon_min = epsilon_min
     self.memory = SimpleBuffer(max_size=buffer_size, device=device)
     self.global_step_count = 0
-    self.qnet1 = QNet(state_dim, action_dim, layer_param).to(device)
-    self.qnet2 = QNet(state_dim, action_dim, layer_param).to(device)
+    self.training_progress = []
+    self.plot_dir = plot_dir
+    self.action_dim = action_space
+    if layer_param == "conv":
+      #self.channel_dim = state_space.shape[-1]
+      #self.action_dim = action_space.shape[0]
+      self.qnet1 = ConvQNet(state_space[-1], self.action_dim).to(device)
+      self.qnet2 = ConvQNet(state_space[-1], self.action_dim).to(device)
+    else:
+      #self.state_dim = state_space.shape[0]
+      #self.action_dim = action_space.n
+      self.qnet1 = DenseQNet(state_space, self.action_dim, layer_param).to(device)
+      self.qnet2 = DenseQNet(state_space, self.action_dim, layer_param).to(device)
     self.optimizer1 = optim.Adam(self.qnet1.parameters(), lr=lr)
     self.optimizer2 = optim.Adam(self.qnet2.parameters(), lr=lr)
 
@@ -87,7 +103,9 @@ class DQNAgent:
       The action which will be executed next.
     """
     if random.random() > self.epsilon:
-      obs = torch.from_numpy(obs).float().unsqueeze(0).to(self.device)
+      obs_img = torch.from_numpy(obs["image"].copy()).float().unsqueeze(0).to(self.device)
+      obs_data = torch.from_numpy(np.array(obs["direction"]).copy()).float().unsqueeze(0).to(self.device)
+      obs = (obs_img, obs_data)
       self.qnet1.eval()
       with torch.no_grad():
         action_values = self.qnet1(obs)
@@ -100,11 +118,25 @@ class DQNAgent:
     return action
 
   def step(self, state, action, reward, next_state, done):
-    self.memory.push(state, action, reward, next_state, done)
-    if self.global_step_count % 2 == 0 and len(self.memory) > self.batch_size:
-      batch = self.memory.sample(self.batch_size)
-      self.optimize_regular(batch)
-      #self.optimize_clipped(batch)
+    state_img = state["image"]
+    state_data = state["direction"]
+    next_state_img = next_state["image"]
+    next_state_data = next_state["direction"]
+    self.memory.push(state_img,
+                     state_data,
+                     action,
+                     reward,
+                     next_state_img,
+                     next_state_data,
+                     done)
+    if self.global_step_count % self.training_interval == 0:
+      if len(self.memory) > self.batch_size:
+        batch = self.memory.sample(self.batch_size)
+        loss = self.optimize_regular(batch)
+        self.training_progress.append([self.global_step_count, reward, loss, self.epsilon])
+    if self.training_progress and self.global_step_count % 1000 == 0:
+      plot_train_progress(self.training_progress,
+                          save_dir=self.plot_dir + "/agent_training.png")
     self.global_step_count += 1
 
   def optimize_clipped(self, batch):
@@ -158,6 +190,7 @@ class DQNAgent:
     loss.backward()
     self.optimizer1.step()
     self._update_target_network(self.qnet1, self.qnet2)
+    return loss
 
   def _compute_regular_loss(self, batch):
     """

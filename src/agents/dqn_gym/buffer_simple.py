@@ -17,10 +17,10 @@ class SimpleBuffer:
 
   def sample(self, batch_size):
     batch = np.asarray(random.sample(self.buffer, batch_size))
-    states = np.vstack(batch[:, 0])
+    states = np.stack(batch[:, 0])
     actions = np.vstack(batch[:, 1])
     rewards = np.vstack(batch[:, 2])
-    next_states = np.vstack(batch[:, 3])
+    next_states = np.stack(batch[:, 3])
     dones = np.vstack(batch[:, 4])
     states = torch.from_numpy(states).float().to(device=self.device)
     actions = torch.from_numpy(actions).long().to(device=self.device)
