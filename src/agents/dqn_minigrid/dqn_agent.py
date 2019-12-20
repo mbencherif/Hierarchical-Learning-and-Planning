@@ -82,8 +82,8 @@ class DQNAgentMinigrid:
     if layer_param == "conv":
       #self.channel_dim = state_space.shape[-1]
       #self.action_dim = action_space.shape[0]
-      self.qnet1 = ConvQNet(state_space[-1], self.action_dim).to(device)
-      self.qnet2 = ConvQNet(state_space[-1], self.action_dim).to(device)
+      self.qnet1 = ConvQNet(state_space[-1], self.action_dim, device=device).to(device)
+      self.qnet2 = ConvQNet(state_space[-1], self.action_dim, device=device).to(device)
     else:
       #self.state_dim = state_space.shape[0]
       #self.action_dim = action_space.n
@@ -187,7 +187,7 @@ class DQNAgentMinigrid:
     """Optimize the Q networks corresponding to Double Q-Learning."""
     loss = self._compute_regular_loss(batch)
     self.optimizer1.zero_grad()
-    loss.backward()
+    loss.backward(retain_graph=True)
     self.optimizer1.step()
     self._update_target_network(self.qnet1, self.qnet2)
     return loss

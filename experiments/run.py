@@ -28,7 +28,7 @@ def run(device, config, save_dir):
                            save_dir=save_dir,
                            env_id=env_id)
     if mode is 3:
-        env_id = "MiniGrid-Empty-5x5-v0"
+        env_id = "MiniGrid-Fetch-5x5-N2-v0"
         run_minigrid(agent_param=config,
                      device=device,
                      save_dir=save_dir,
@@ -38,6 +38,7 @@ def run(device, config, save_dir):
 
 def main(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
     config = read_config(args.config_file)
     run(device=device, config=config, save_dir=args.save_directory)
 
